@@ -6,11 +6,12 @@ import { Logo } from '@/components/ui/logo'
 import { UploadDropzone } from '@/utils/uploadthing'
 import { ClientUploadedFileData } from 'uploadthing/types'
 import { uploadFiles } from '@/server/action'
+import { Progress } from "@/components/ui/progress"
 
 export default function SendPage() {
   const [files, setFiles] = useState<ClientUploadedFileData<null>[]>([])
   const [bucketCode, setBucketCode] = useState('')
-
+  const [progress, setProgress] = useState(0)
 
   const handleUpload = async (res: ClientUploadedFileData<null>[]) => {
      const response = await uploadFiles(res, bucketCode)
@@ -47,14 +48,17 @@ export default function SendPage() {
             >
               <UploadDropzone
                 endpoint="imageUploader"
+                onUploadProgress={(progress) => {
+                  setProgress(progress);
+                }
+                }
                 onClientUploadComplete={(res) => {
-                  // Do something with the response
                   setFiles((prev) => [...prev, ...res]);
                   handleUpload(res)
                   alert("Upload Completed");
+                  setProgress(0);
                 }}
                 onUploadError={(error: Error) => {
-                  // Do something with the error.
                   alert(`ERROR! ${error.message}`);
                 }}
               />
@@ -68,7 +72,7 @@ export default function SendPage() {
                 ))}
               </ul>
             )}
-            
+            <Progress value={progress} className="mt-4" />
           </CardContent>
         </Card>
       </main>

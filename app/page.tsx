@@ -1,9 +1,36 @@
+'use client'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Send, Download, FileText, Lock, Zap } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const [fileCount, setFileCount] = useState(0)
+  const [targetCount, setTargetCount] = useState(0)
+    
+  useEffect(() => {
+    async function fetchCount() {
+      const response = await fetch('/api/stats', { next: { revalidate: 3600}})
+      const data = await response.json()
+      console.log(data)
+      setTargetCount(data.res._sum.fileNumber)
+    }
+    fetchCount() 
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFileCount(prevCount => {
+        const nextCount = prevCount + Math.floor(Math.random() * 10) + 1
+        return nextCount >= targetCount ? targetCount : nextCount
+      })
+    }, 50)
+
+    return () => clearInterval(interval)
+  }, [targetCount])
+
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-white to-purple-100">
       <header className="bg-white shadow-sm p-4">
@@ -49,10 +76,23 @@ export default function Home() {
             description="Upload and download files at blazing speeds."
           />
         </div>
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+            Trusted by Users Worldwide
+          </h2>
+          <div className="bg-white rounded-lg shadow-lg p-8 inline-block">
+            <p className="text-gray-600 mb-2">Total Files Shared</p>
+            <div
+              className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text"
+            >
+              {fileCount.toLocaleString()}
+            </div>
+          </div>
+        </div>
       </main>
       <footer className="bg-gray-100 py-6">
         <div className="container mx-auto text-center text-gray-600">
-          &copy; 2023 PrintCBS. All rights reserved.
+          &copy; 2025 PrintCBS. All rights reserved. Made with ❤️ by Vinu.
         </div>
       </footer>
     </div>
@@ -61,7 +101,7 @@ export default function Home() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 text-center">
+    <div className="bg-white rounded-lg shadow-md p-6 text-center flex-col flex items-center">
       <div className="mb-4">{icon}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-gray-600">{description}</p>

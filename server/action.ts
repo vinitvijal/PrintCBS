@@ -1,7 +1,10 @@
 'use server'
 import { PrismaClient } from '@prisma/client'
 import { ClientUploadedFileData } from 'uploadthing/types'
+import { UTApi } from "uploadthing/server";
 
+
+const utapi = new UTApi();
 const prisma = new PrismaClient()
 
 
@@ -66,4 +69,33 @@ export async function deleteFile(fileId: string) {
       key: fileId
     }
   })
+
+  try {
+    await utapi.deleteFiles([fileId]);
+    console.log("UTAPI: Files deleted successfully");
+  } catch (error) {
+    console.error("UTAPI: Error deleting files", error);
+  }
 }
+
+export async function olderFilesDelete(){
+    const files = await prisma.files.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(new Date().getTime() - 60 * 60 * 1000) // 1 hour ago
+            }
+        }, 
+        select: {
+            key: true
+        }
+    })
+    try {
+        await utapi.deleteFiles(files.map(file => file.key));
+        console.log(`Files deleted successfully for ${new Date().getTime() - 60 * 60 * 1000}`);
+      } catch (error) {
+        console.error("UTAPI: Error deleting files", error);
+      }
+    console.log(files)
+    return files
+}
+
