@@ -41,10 +41,10 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
-            Seamless File Sharing
+          Share Files Instantly
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto text-gray-600">
-            Share files instantly without login or authentication. Fast, secure, and simple.
+           Anytime, Anywhere. Effortless file sharing without logins or delays – fast, secure, and cross-device compatible
           </p>
           <div className="flex justify-center space-x-4">
             <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
@@ -63,17 +63,17 @@ export default function Home() {
           <FeatureCard
             icon={<FileText className="h-10 w-10 text-blue-600" />}
             title="Any File Type"
-            description="Share documents, images, videos, and more with ease."
+            description="Share documents, images, videos, or any file type effortlessly – perfect for students and staff."
           />
           <FeatureCard
             icon={<Lock className="h-10 w-10 text-purple-600" />}
             title="Secure Sharing"
-            description="Your files are encrypted and protected during transfer."
+            description="Enjoy safe and secure file transfers with automatic file deletion within 24 hours."
           />
           <FeatureCard
             icon={<Zap className="h-10 w-10 text-yellow-500" />}
             title="Lightning Fast"
-            description="Upload and download files at blazing speeds."
+            description="Share files instantly with blazing-fast upload and download speeds."
           />
         </div>
         <div className="mt-16 text-center">
@@ -81,7 +81,7 @@ export default function Home() {
             Trusted by Users Worldwide
           </h2>
           <div className="bg-white rounded-lg shadow-lg p-8 inline-block">
-            <p className="text-gray-600 mb-2">Total Files Shared</p>
+            <p className="text-gray-600 mb-2">Files Shared Till Now</p>
             <div
               className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text"
             >
@@ -92,7 +92,8 @@ export default function Home() {
       </main>
       <footer className="bg-gray-100 py-6">
         <div className="container mx-auto text-center text-gray-600">
-          &copy; 2025 PrintCBS. All rights reserved. Made with ❤️ by Vinu.
+          Made with ❤️ by <a href="https://www.linkedin.com/in/vinitvijal" target='_blank' className="font-semibold text-gray-800"
+          >Vinu.</a>
         </div>
       </footer>
     </div>
