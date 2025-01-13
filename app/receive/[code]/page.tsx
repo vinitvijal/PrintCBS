@@ -1,56 +1,62 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Download, Trash2, Search } from 'lucide-react'
+import { Download, Trash2, Search, Loader } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { Files } from '@prisma/client'
+import { deleteFile, getFiles } from '@/server/action'
+import { toast } from 'sonner'
 
-interface File {
-  id: string
-  name: string
-  size: string
-  type: string
-}
 
 export default function ReceiveFilesPage() {
   const params = useParams()
   const code = params.code as string
+  const router = useRouter();
 
-  const [files, setFiles] = useState<File[]>([])
+  const [files, setFiles] = useState<Files[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [isDownloading, setIsDownloading] = useState("")
 
   useEffect(() => {
-    // Simulate fetching files based on the code
     const fetchFiles = async () => {
       setIsLoading(true)
-      // In a real application, you would fetch the files from your backend here
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate network delay
-      setFiles([
-        { id: '1', name: 'document.pdf', size: '2.5 MB', type: 'PDF' },
-        { id: '2', name: 'image.jpg', size: '1.8 MB', type: 'Image' },
-        { id: '3', name: 'spreadsheet.xlsx', size: '3.2 MB', type: 'Spreadsheet' },
-      ])
+      const response = await getFiles(code)
+      if(!response){
+        router.replace('/receive')
+        return
+      }
+      setFiles(response)
       setIsLoading(false)
     }
 
     fetchFiles()
   }, [code])
 
-  const handleDownload = (fileId: string) => {
-    // Implement download logic here
-    console.log(`Downloading file with id: ${fileId}`)
+  const handleDownload = (key: string) => {
+    setIsDownloading(key)
+
+    setTimeout(() => {
+      setIsDownloading("")
+    }, 2000)
+
+    setIsDownloading("")
+    // fetchFile(key)
+    console.log(`Downloading file with id: ${key}`)
   }
 
-  const handleDelete = (fileId: string) => {
-    setFiles(prev => prev.filter(file => file.id !== fileId))
+  const handleDelete = async (fileId: string) => {
+    setFiles(prev => prev.filter(file => file.key !== fileId))
+    await deleteFile(fileId)
+    toast.success('File deleted successfully')
   }
 
   const filteredFiles = files.filter(file =>
-    file.name.toLowerCase().includes(searchTerm.toLowerCase())
+    file.fileName.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
@@ -90,16 +96,18 @@ export default function ReceiveFilesPage() {
                 ) : (
                   <ul className="space-y-4">
                     {filteredFiles.map(file => (
-                      <li key={file.id} className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+                      <li key={file.key} className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
                         <div>
-                          <p className="font-medium text-gray-800">{file.name}</p>
-                          <p className="text-sm text-gray-500">{file.size} • {file.type}</p>
+                          <p className="font-medium text-gray-800">{file.fileName}</p>
+                          <p className="text-sm text-gray-500">{file.fileSize} • {file.fileType}</p>
                         </div>
                         <div className="flex space-x-2">
-                          <Button size="sm" onClick={() => handleDownload(file.id)} className="bg-blue-600 hover:bg-blue-700">
-                            <Download className="mr-2 h-4 w-4" /> Download
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleDelete(file.id)} className="border-red-500 text-red-500 hover:bg-red-50">
+                          <a href={file.fileUrl} download>
+                            <Button size="sm" onClick={() => handleDownload(file.key)} className="bg-blue-600 hover:bg-blue-700">
+                              {file.key === isDownloading ? <Loader className=' animate-spin' /> : <Download className="mr-2 h-4 w-4" />} Download
+                            </Button>
+                          </a>
+                          <Button size="sm" variant="outline" onClick={() => handleDelete(file.key)} className="border-red-500 text-red-500 hover:bg-red-50">
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </Button>
                         </div>
