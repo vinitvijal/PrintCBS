@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next'
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'ShareCBS',
-    short_name: 'ShareCBs',
+    short_name: 'ShareCBS',
     description: 'A Progressive Web App built with ❤️ by Vinu',
     start_url: '/',
     display: 'standalone',
